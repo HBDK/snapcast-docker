@@ -33,7 +33,7 @@ jobs:
 
       - name: store alpine_version tag
         id: alpine_version
-        run: echo ::set-output name=alpine_version::hbdk/snapcast-client:$(grep -P -o "alpine:.+" client/Dockerfile)
+        run: echo ::set-output name=alpine_version::hbdk/snapcast-client:$(grep -P -o "alpine:.+" client/Dockerfile | sed "s/:/-/")
 
       - name: store snapcast_version tag
         id: snapcast_version
