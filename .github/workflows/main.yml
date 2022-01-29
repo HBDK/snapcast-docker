@@ -28,7 +28,8 @@ jobs:
         id: event_name
         run: |
           echo "test"
-          cat $GITHUB_EVENT_PATH
+          tag_name=$(cat $GITHUB_EVENT_PATH | grep tag_name | sed -E 's/.*"([^"]+)".*/\1/')
+          echo $tag_name
 #        run: echo ::set-output name=event_name::hbdk/snapcast-client:$(cat $GITHUB_EVENT_PATH | grep tag_name | sed -E 's/.*"([^"]+)".*/\1/')
 
       - name: store alpine_version tag
