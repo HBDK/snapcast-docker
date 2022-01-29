@@ -28,7 +28,7 @@ jobs:
         id: event_name
         run: |
           echo "test"
-          echo cat $GITHUB_EVENT_PATH
+          cat $GITHUB_EVENT_PATH
 #        run: echo ::set-output name=event_name::hbdk/snapcast-client:$(cat $GITHUB_EVENT_PATH | grep tag_name | sed -E 's/.*"([^"]+)".*/\1/')
 
       - name: store alpine_version tag
@@ -48,6 +48,6 @@ jobs:
           push: true
 #            ${{ steps.event_name.outputs.event_name }}
           tags: |
-            ${{ steps.snapcast_version.outputs.snapcast_version }}
+            ${{ steps.alpine_version.outputs.alpine_version }}
             ${{ steps.snapcast_version.outputs.snapcast_version }}
             hbdk/snapcast-client:latest
