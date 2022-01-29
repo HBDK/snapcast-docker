@@ -26,11 +26,13 @@ jobs:
 
       - name: store event_name tag
         id: event_name
-        run: echo ::set-output name=event_name::hbdk/snapcast-client:$(cat $GITHUB_EVENT_PATH | grep tag_name | sed -E 's/.*"([^"]+)".*/\1/')
+        run: |
+          tag_name=$(cat $GITHUB_EVENT_PATH | grep tag_name | sed -E 's/.*"([^"]+)".*/\1/')
+          echo ::set-output name=event_name::hbdk/snapcast-client:$([[ ! -z "$var" ]] && echo $tag_name || echo "manual")
 
       - name: store alpine_version tag
         id: alpine_version
-        run: echo ::set-output name=alpine_version::hbdk/snapcast-client:$(grep -P -o "alpine:.+" client/Dockerfile)
+        run: echo ::set-output name=alpine_version::hbdk/snapcast-client:$(grep -P -o "alpine:.+" client/Dockerfile | sed "s/:/-/")
 
       - name: store snapcast_version tag
         id: snapcast_version
@@ -45,6 +47,6 @@ jobs:
           push: true
           tags: |
             ${{ steps.event_name.outputs.event_name }}
-            ${{ steps.snapcast_version.outputs.snapcast_version }}
+            ${{ steps.alpine_version.outputs.alpine_version }}
             ${{ steps.snapcast_version.outputs.snapcast_version }}
             hbdk/snapcast-client:latest
