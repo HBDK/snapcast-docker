@@ -1,0 +1,49 @@
+name: build
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  multi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: store event_name tag
+        id: vars
+        run: echo ::set-output name=event_name::hbdk/snapcast-client:$(cat $GITHUB_EVENT_PATH | grep tag_name | sed -E 's/.*"([^"]+)".*/\1/')
+
+      - name: store alpine_version tag
+        id: vars
+        run: echo ::set-output name=alpine_version::hbdk/snapcast-client:$(grep -P -o "alpine:.+" client/Dockerfile)
+
+      - name: store snapcast_version tag
+        id: vars
+        run: echo ::set-output name=snapcast_version::hbdk/snapcast-client:$(grep -P -o "(?<=snapcast-client=).+" client/Dockerfile)
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./client/Dockerfile
+          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
+          push: true
+          tags: |
+            ${{ steps.vars.outputs.event_name }}
+            ${{ steps.vars.outputs.snapcast_version }}
+            ${{ steps.vars.outputs.snapcast_version }}
+            hbdk/snapcast-client:latest
